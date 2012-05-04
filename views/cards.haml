@@ -1,0 +1,9 @@
+%html
+  %body
+    - @board.cards.each do |card|
+      %p
+        - if card.name =~ /\#[0-9]+/
+          %a{:href => "/card/#{card.id}"}= card.name
+    %p
+      - @lists.each do |list|
+        %a{:href => "/list/#{list.id}"}= list.name

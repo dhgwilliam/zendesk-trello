@@ -1,0 +1,8 @@
+%html
+  %body
+    List
+    %a{:href => "/list/#{@list.id}"}= @list.name
+    has cards:
+    - @list.cards.each do |card|
+      %p
+        %a{:href => "/card/#{card.id}"}= card.name

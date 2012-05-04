@@ -4,8 +4,9 @@ gem 'ruby-trello'
 gem 'sinatra'
 gem 'haml'
 gem 'sass'
-gem 'ohm'
+gem 'httparty'
 
 group 'development' do
   gem 'shotgun'
+  gem 'htmlentities'
 end

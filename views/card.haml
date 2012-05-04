@@ -1,0 +1,14 @@
+%html
+  %body
+    %p
+      =@card.name
+      %br
+      Belongs to list
+      %a{:href => "/list/#{@card.list.id}"}= List.find(@card.list.id).name
+      on board
+      %a{:href => "/board/#{@card.board.id}"}= Board.find(@card.board.id).name
+      %br
+      and exists on Zendesk at 
+      %a{:href => "https://support.puppetlabs.com/tickets/#{@ticket["nice_id"]}"}= @ticket["nice_id"]
+      with status
+      = @status

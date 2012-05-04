@@ -1,0 +1,7 @@
+%html
+  %body
+    %p
+      %a{:href => "/user/#{@user.id}"}= @user.full_name
+    %p
+      - @boards.each do |board|
+        %a{:href => "/board/#{board.id}"}= board.name
