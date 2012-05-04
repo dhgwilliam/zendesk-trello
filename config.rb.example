@@ -1,0 +1,30 @@
+require 'httparty'
+include Trello::Authorization
+
+TRELLO_API_KEY = 
+TRELLO_APP_SECRET = 
+TRELLO_TOKEN = 
+ZENDESK_URL = 
+ZENDESK_EMAIL = 
+ZENDESK_PASSWORD = 
+
+Trello::Authorization.const_set :AuthPolicy, OAuthPolicy
+OAuthPolicy.consumer_credential = OAuthCredential.new TRELLO_API_KEY, TRELLO_APP_SECRET
+OAuthPolicy.token = OAuthCredential.new TRELLO_TOKEN, nil
+
+class Zendesk
+  include HTTParty
+  base_uri ZENDESK_URL
+
+  def initialize(u, p)
+    @auth = {:username => u, :password => p}
+  end
+
+  def ticket(id, options={})
+    options.merge!({:basic_auth => @auth})
+    self.class.get("/tickets/#{id}.json", options).body
+  end
+end
+
+config = { :email => ZENDESK_EMAIL, :password => ZENDESK_PASSWORD }
+Z = Zendesk.new(config[:email], config[:password])
