@@ -15,8 +15,8 @@ class Issue < Ohm::Model
   unique :number
   unique :trello_id
 
-  index :trello_id
   index :number
+  index :trello_id
 
   def validate
     assert_present :number
@@ -36,6 +36,10 @@ class List < Ohm::Model
   unique :trello_id
 
   index :trello_id
+
+  def validate
+    assert_present :trello_id
+  end
 end
 
 class Board < Ohm::Model
@@ -48,4 +52,7 @@ class Board < Ohm::Model
   collection :lists, :List
   collection :issues, :Issue
 
+  def validate
+    assert_present :trello_id
+  end
 end

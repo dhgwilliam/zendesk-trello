@@ -2,70 +2,122 @@ require 'sinatra'
 require 'trello'
 require 'json'
 require 'haml'
+require 'resque'
 require './config.rb'
-include Trello
-require 'httparty'
-require 'htmlentities'
-
-# LIST_TO_STATUS = {
-
+require './card.rb'
 
 get '/' do
-  @user = Member.find("me")
+  @user = Trello::Member.find("me")
   @boards = @user.boards
-  haml :index
+  redirect to("/sync?board=#{@boards.first.id}")
 end
 
 get '/user/:user' do
-  @user = Member.find(params[:user])
+  @user = Trello::Member.find(params[:user])
   haml :user
 end
 
-get '/board/:board' do
-  @board = Board.find(params[:board])
-  @lists = []
-  @board.lists.each { |list| @lists << list }
+get '/sync' do
+  @oboard = get_board(params[:board])
+  @oboard.lists.each { |list| get_list(list.id) }
+  @oboard.cards.each { |card| get_card(card.id) }
+  redirect to("/board/#{Board.find(:trello_id => params[:board])}")
+end
+
+get '/board/inspect' do
+  @user = Trello::Member.find("me")
+  @boards = @user.boards
+
+  "#{get_board(@boards.first.id)}"
+end
+
+get '/board/:trello_id' do
+  unless Board.find(:trello_id => params[:trello_id]).first
+    redirect to("/board/new/#{params[:trello_id]}")
+  end
+
+  @board = Board.find(:trello_id => params[:trello_id]).first
+  @cards = @board.issues
+  @lists = @board.lists
+  # Trello::Board.find(params[:trello_id]).lists.each { |list| @lists << list }
   haml :cards
 end
 
+get '/board/new/:trello_id' do
+  get_board(params[:trello_id])
+  redirect to("/board/#{params[:trello_id]}")
+end
+
+
 get '/card/:card' do
-  @card = Card.find(params[:card])
-  # @ticket = Z.tickets(@card.name.scan(/#[0-9]+/).delete "#")
-  @ticket = JSON::parse(Z.ticket(@card.name.scan(/\#[0-9]+/).first.delete "#"))
-    @status = get_z_status(@ticket["status_id"])
+  unless Issue.find(:trello_id => params[:card]).first
+    redirect to("/issue/new/trello/#{params[:card]}?intent=#{request.url}")
+  end
+
+  @card = Issue.find(:trello_id => params[:card]).first
+  @list = @card.list
+  @ticket = @card.last_json
+  @status = Z.status(@card.status.to_i)
   haml :card
 end
 
+get '/issue/new/trello/:trello_id' do
+  redirect to("/card/#{params[:trello_id]}")
+end
+
 get '/list/:list' do
-  @list = List.find(params[:list])
-  @board = Board.find(@list.board_id)
+  @list = Trello::List.find(params[:list])
+  @board = Trello::Board.find(@list.board_id)
   haml :list
 end
 
+get '/list/new/:trello_id' do
+  get_list(params[:trello_id])
+  # redirect to(params[:intent])
+  redirect to("/list/#{params[:trello_id]}")
+end
+
 get '/zendesk/:ticket' do
-  @ticket = JSON::parse(Z.ticket('999'))
-  coder = HTMLEntities.new
+  @ticket = Z.ticket(params[:ticket])
   "#{@ticket}"
 end
 
-get '/favicon.ico' do
-end
-
 helpers do
-  def get_z_status(status_id)
-    case @ticket["status_id"]
-    when 0
-      @status = "New"
-    when 1
-      @status = "Open"
-    when 2
-      @status = "Pending"
-    when 3
-      @status = "Solved"
-    when 4
-      @status = "Closed"
-    else
-      @status = "Unknown"
+  def get_list(trello_id)
+    if List.find(:trello_id => trello_id).first.nil?
+      @olist = Trello::List.find(trello_id)
+      List.create :name => @olist.name, 
+        :trello_id => trello_id,
+        :board => Board.find(:trello_id => @olist.board_id).first
+    end
+  end
+
+  def get_board(trello_id)
+    @oboard = Trello::Board.find(trello_id)
+    unless Board.find(:trello_id => trello_id) then
+      @board = Board.create :name => @oboard.name, :trello_id => @oboard.id
+    end
+    return @oboard
+  end
+
+  def get_card(trello_id)
+    unless Issue.find(:trello_id => trello_id).first
+      @ocard = Trello::Card.find(trello_id)
+      if @ocard.name.scan(/\#[0-9]+/).first
+        @number = @ocard.name.scan(/\#[0-9]+/).first.delete "#"
+        @zticket = Z.ticket(@number)
+        get_list(@ocard.list_id)
+        get_board(@ocard.board_id)
+        @card = Issue.create :number => @number,
+          :trello_id => trello_id,
+          :timestamp => Time.now.to_i,
+          :last_json => @zticket,
+          :oname => @ocard.name,
+          :zname => @zticket["description"],
+          :status => @zticket["status_id"],
+          :list => Board.find(:trello_id => @ocard.list_id).first,
+          :board => Board.find(:trello_id => @ocard.board_id).first
+      end
     end
   end
 end
