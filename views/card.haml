@@ -4,8 +4,7 @@
       =@card.oname
       %br
       Belongs to list
-      %a{:href => "/list/#{@card.list}"} link
-      = @card.list
+      %a{:href => "/list/#{@card.list.trello_id}"}= @card.list.name
       on board
       %a{:href => "/board/#{@card.board.trello_id}"}= @card.board.name
       %br
@@ -13,3 +12,7 @@
       %a{:href => "https://support.puppetlabs.com/tickets/#{@card.number}"}= @card.number
       with status
       = @status
+      %br
+      %br
+      %a{:href => url("/issue/new/zendesk/#{@card.number}")} Update this card
+

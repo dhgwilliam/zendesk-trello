@@ -1,11 +1,12 @@
 %html
   %body
     Cards:
-    - @cards.each do |card|
+    - @board.issues.sort_by(:number).each do |card|
       %p
       - if card.oname =~ /\#[0-9]+/
-        %a{:href => "/card/#{card.trello_id}"}= card.oname
+        %a{:href => "/issue/delete/#{card.number}"} Delete this card
+        %a{:href => "/issue/#{card.number}"}= card.oname
     %p
       Lists:
-      - @lists.each do |list|
+      - @board.lists.each do |list|
         %a{:href => "/list/#{list.trello_id}"}= list.name

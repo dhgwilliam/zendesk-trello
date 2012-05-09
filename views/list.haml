@@ -1,10 +1,10 @@
 %html
   %body
     List
-    %a{:href => "/list/#{@list.id}"}= @list.name
+    %a{:href => "/list/#{@list.trello_id}"}= @list.name
     belongs to
-    %a{:href => to("/board/#{@board.id}")}= @board.name
-    has cards:
-    - @list.cards.each do |card|
+    %a{:href => to("/board/#{@board.trello_id}")}= @board.name
+    has issues:
+    - @list.issues.sort_by(:number).each do |issue|
       %p
-        %a{:href => url("/card/#{card.id}")}= card.name
+        %a{:href => url("/issue/#{issue.number}")}= issue.oname

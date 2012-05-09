@@ -14,22 +14,40 @@ class Zendesk
     JSON::parse(self.class.get("/tickets/#{id}.json", options).body)
   end
 
+  def tickets_all(options={})
+    options.merge!({:basic_auth => @auth})
+    JSON::parse(self.class.get("/rules/73318.json", options).body)
+  end
+
+  def org_name(organization_id, options={})
+    options.merge!({:basic_auth => @auth})
+    org = JSON::parse(self.class.get("/organizations/#{organization_id}.json", options).body)
+    org["name"]
+  end
+
+
   def status(status_id)
+    @target_list = []
     case status_id
-    when 0
+    when "0"
       @status = "New"
-    when 1
+      @target_list << List.with(:name, "Back Log").trello_id
+    when "1"
       @status = "Open"
-    when 2
+      @target_list = [ List.with(:name, "Active").trello_id, List.with(:name, "Blocked").trello_id]
+    when "2"
       @status = "Pending"
-    when 3
+      @target_list << List.with(:name, "Pending Client Response").trello_id
+    when "3"
       @status = "Solved"
-    when 4
+      @target_list = [ List.with(:name, "Complete").trello_id, List.with(:name, "To Be Documented").trello_id ]
+    when "4"
       @status = "Closed"
+      @target_list = [ List.with(:name, "Complete").trello_id, List.with(:name, "To Be Documented").trello_id ]
     else
       @status = "Unknown"
     end
-
+    return [ @status, @target_list ]
   end
 end
 
