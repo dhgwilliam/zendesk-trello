@@ -11,8 +11,7 @@ BOARD = "4f4e8539b7b81632280c9ccf"
 
 get '/' do
   @user = Trello::Member.find("me")
-  @boards = @user.boards
-  redirect to("/board/#{@boards.first.id}")
+  redirect to("/board/#{@user.boards.first.id}")
 end
 
 get '/sync/trello' do
@@ -42,14 +41,14 @@ get '/issue/:number' do
   if Issue.with(:number, params[:number]).nil?
     redirect to("/issue/new/zendesk/#{params[:number]}")
   end
-  @card = Issue.with(:number, params[:number])
-  @status = Z.status(@card.status).first
+  @issue = Issue.with(:number, params[:number])
+  @status = Z.status(@issue.status).first
   haml :card
 end
 
 get '/issue/new/zendesk/:number' do
   @issue = get_issue(params[:number])
-  redirect to("/issue/#{params[:number]}")
+  redirect to("/board/#{BOARD}")
 end
 
 get '/issue/delete/:number' do
@@ -113,6 +112,7 @@ helpers do
   end
 
   def get_issue(zendesk_id)
+    changed = false
     @zticket = Z.ticket(zendesk_id)
     if Issue.with(:number, zendesk_id).nil?
       issue = Issue.create :number => zendesk_id,
@@ -125,17 +125,20 @@ helpers do
       issue = Issue.with(:number, zendesk_id)
       @ocard = Trello::Card.find(issue.trello_id)
       @lists = Z.status(@zticket["status_id"].to_s).last
-      puts @lists.inspect
-      issue.update(:status => @zticket["status_id"])
-      puts Z.status(@zticket["status_id"].to_s).last.first
+      new_name = "##{zendesk_id} - #{Z.org_name(@zticket["organization_id"])} - #{@zticket["current_tags"]}"
+      unless new_name == issue.oname
+        changed = true
+      end
+      issue.update(:status => @zticket["status_id"],
+                    :oname => new_name)
+      @ocard.name = issue.oname
       unless @lists.include?(issue.list.trello_id)
-        issue.update(:list => List.with(:trello_id, @lists.first),
-                    :oname => "##{zendesk_id} - #{Z.org_name(@zticket["organization_id"])} - #{@zticket["current_tags"]}")
-        card = @ocard.dup
-        card.list_id = issue.list.trello_id
-        card.name = issue.oname
-        card.save
-        puts issue.number + " updated"
+        issue.update(:list => List.with(:trello_id, @lists.first))
+        @ocard.list_id = issue.list.trello_id
+        changed = true
+      end
+      if changed
+        @ocard.save
       end
 
       # not entirely sure why this is necessary

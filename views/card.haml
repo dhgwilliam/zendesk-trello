@@ -1,18 +1,18 @@
 %html
   %body
     %p
-      =@card.oname
+      =@issue.oname
       %br
       Belongs to list
-      %a{:href => "/list/#{@card.list.trello_id}"}= @card.list.name
+      %a{:href => "/list/#{@issue.list.trello_id}"}= @issue.list.name
       on board
-      %a{:href => "/board/#{@card.board.trello_id}"}= @card.board.name
+      %a{:href => "/board/#{@issue.board.trello_id}"}= @issue.board.name
       %br
       and exists on Zendesk at 
-      %a{:href => "https://support.puppetlabs.com/tickets/#{@card.number}"}= @card.number
+      %a{:href => "https://support.puppetlabs.com/tickets/#{@issue.number}"}= @issue.number
       with status
       = @status
       %br
       %br
-      %a{:href => url("/issue/new/zendesk/#{@card.number}")} Update this card
+      %a{:href => url("/issue/new/zendesk/#{@issue.number}")} Update this card
 

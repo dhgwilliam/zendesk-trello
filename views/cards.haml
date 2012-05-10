@@ -1,12 +1,12 @@
 %html
   %body
-    Cards:
-    - @board.issues.sort_by(:number).each do |card|
-      %p
-      - if card.oname =~ /\#[0-9]+/
-        %a{:href => "/issue/delete/#{card.number}"} Delete this card
-        %a{:href => "/issue/#{card.number}"}= card.oname
-    %p
-      Lists:
-      - @board.lists.each do |list|
-        %a{:href => "/list/#{list.trello_id}"}= list.name
+    - @board.lists.each do |list|
+      %a{:href => "/list/#{list.trello_id}"}= list.name
+      - @board.issues.sort_by(:number).each do |card|
+        %p
+        - if card.oname =~ /\#[0-9]+/ && List.with(:trello_id, Z.status(card.status).last.first).trello_id == list.trello_id
+          %a{:href => "/issue/delete/#{card.number}"} X
+          %a{:href => "/issue/new/zendesk/#{card.number}"}= Z.status(card.status).first
+          %a{:href => "/issue/#{card.number}"}= card.oname
+      %br
+

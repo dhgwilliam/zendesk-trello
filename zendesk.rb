@@ -16,7 +16,7 @@ class Zendesk
 
   def tickets_all(options={})
     options.merge!({:basic_auth => @auth})
-    JSON::parse(self.class.get("/rules/73318.json", options).body)
+    JSON::parse(self.class.get("/rules/73321.json", options).body)
   end
 
   def org_name(organization_id, options={})
