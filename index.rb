@@ -68,6 +68,20 @@ get '/list/new/:trello_id' do
   redirect to("/list/#{params[:trello_id]}")
 end
 
+get '/who/:number' do
+  authors = Z.who_touched(params[:number])
+  authors.each do |zendesk_id, name|
+    if User.with(:zendesk_id, zendesk_id).nil?
+      User.create :name => name, :zendesk_id => zendesk_id
+    end
+  end
+  "#{authors}"
+end
+
+get '/user/delete/:id' do
+  User[params[:id]].delete
+end
+
 get '/zendesk/:id' do
   coder = HTMLEntities.new
   coder.encode(Z.ticket(params[:id]))

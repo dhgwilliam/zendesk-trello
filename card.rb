@@ -12,8 +12,10 @@ class Issue < Ohm::Model
   reference :list, :List
   reference :board, :Board
 
+  reference :user, :User
+  collection :user, :User
+
   unique :number
-  # unique :trello_id
 
   index :number
   index :trello_id
@@ -57,4 +59,13 @@ class Board < Ohm::Model
   def validate
     assert_present :trello_id
   end
+end
+
+class User < Ohm::Model
+  attribute :name
+  attribute :zendesk_id
+  attribute :trello_id
+
+  collection :issues, :Issue
+  reference :issues, :Issue
 end
