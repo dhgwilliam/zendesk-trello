@@ -2,12 +2,10 @@ require 'sinatra'
 require 'trello'
 require 'json'
 require 'haml'
-require 'resque'
 require './config.rb'
 require './card.rb'
 require 'htmlentities'
 
-BOARD = "4f4e8539b7b81632280c9ccf"
 
 get '/' do
   @user = Trello::Member.find("me")
