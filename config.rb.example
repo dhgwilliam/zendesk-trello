@@ -1,3 +1,5 @@
+BASE_URI = "https://yourcompany.zendesk.com"
+
 require 'httparty'
 require './zendesk.rb'
 require 'ohm'
@@ -10,6 +12,13 @@ BOARD = "board_id"
 ZENDESK_URL = "https://support.url.com"
 ZENDESK_EMAIL = "e@mail.you"
 ZENDESK_PASSWORD = "password"
+Zendesk::Z_RECENT_VIEW = "/rules/12345.json"
+Zendesk::BACKLOG_LIST = "Back Log"
+Zendesk::ACTIVE_LIST = "Active"
+Zendesk::BLOCKED_LIST = "Blocked"
+Zendesk::PENDING_LIST = "Pending Client Response"
+Zendesk::TBD_LIST = "To Be Documented"
+Zendesk::COMPLETE_LIST = "Complete"
 
 Trello::Authorization.const_set :AuthPolicy, OAuthPolicy
 OAuthPolicy.consumer_credential = OAuthCredential.new TRELLO_API_KEY, TRELLO_APP_SECRET

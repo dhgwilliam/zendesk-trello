@@ -3,7 +3,7 @@ require 'json'
 
 class Zendesk
   include HTTParty
-  base_uri 'https://support.puppetlabs.com'
+  base_uri Zendesk::BASE_URI
 
   def initialize(u, p)
     @auth = {:username => u, :password => p}
@@ -16,7 +16,7 @@ class Zendesk
 
   def tickets_all(options={})
     options.merge!({:basic_auth => @auth})
-    JSON::parse(self.class.get("/rules/73321.json", options).body)
+    JSON::parse(self.class.get(Z_RECENT_VIEW, options).body)
   end
 
   def org_name(organization_id, options={})
@@ -55,19 +55,19 @@ class Zendesk
     case status_id
     when "0"
       @status = "New"
-      @target_list << List.with(:name, "Back Log").trello_id
+      @target_list << List.with(:name, BACKLOG_LIST).trello_id
     when "1"
       @status = "Open"
-      @target_list = [ List.with(:name, "Active").trello_id, List.with(:name, "Blocked").trello_id]
+      @target_list = [ List.with(:name, ACTIVE_LIST).trello_id, List.with(:name, BLOCKED_LIST).trello_id]
     when "2"
       @status = "Pending"
-      @target_list << List.with(:name, "Pending Client Response").trello_id
+      @target_list << List.with(:name, PENDING_LIST).trello_id
     when "3"
       @status = "Solved"
-      @target_list = [ List.with(:name, "Complete").trello_id, List.with(:name, "To Be Documented").trello_id ]
+      @target_list = [ List.with(:name, COMPLETE_LIST).trello_id, List.with(:name, TBD_LIST).trello_id ]
     when "4"
       @status = "Closed"
-      @target_list = [ List.with(:name, "Complete").trello_id, List.with(:name, "To Be Documented").trello_id ]
+      @target_list = [ List.with(:name, COMPLETE_LIST).trello_id, List.with(:name, TBD_LIST).trello_id ]
     else
       @status = "Unknown"
     end
