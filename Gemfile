@@ -1,6 +1,6 @@
 source :rubygems
 
-gem 'ruby-trello'
+gem 'ruby-trello', '0.4.2'
 gem 'sinatra'
 gem 'haml'
 gem 'sass'
