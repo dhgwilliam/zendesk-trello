@@ -1,2 +1,5 @@
 config.rb
 .crontab
+dump.rdb
+launch
+sync.log
