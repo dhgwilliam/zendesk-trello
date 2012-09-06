@@ -4,7 +4,10 @@
       %a{:href => "/list/#{list.trello_id}"}= list.name
       - @board.issues.sort_by(:number).each do |card|
         %p
-        - if card.oname =~ /\#[0-9]+/ && List.with(:trello_id, Z.status(card.status).last.first).trello_id == list.trello_id
+        - card_oname = card.oname
+        - this_list = List.with(:trello_id, Z.status(card.status).last.first)
+        - this_list ||= List.with(:name, Zendesk::BACKLOG_LIST)
+        - if card_oname =~ /\#[0-9]+/ && this_list.trello_id == list.trello_id
           %a{:href => "/issue/delete/#{card.number}"} X
           %a{:href => "/issue/new/zendesk/#{card.number}"}= Z.status(card.status).first
           %a{:href => "/issue/#{card.number}"}= card.oname

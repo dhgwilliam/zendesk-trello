@@ -21,7 +21,11 @@ class Zendesk
 
   def org_name(organization_id, options={})
     options.merge!({:basic_auth => @auth})
-    org = JSON::parse(self.class.get("/organizations/#{organization_id}.json", options).body)
+    begin
+      org = JSON::parse(self.class.get("/organizations/#{organization_id}.json", options).body)
+    rescue JSON::ParserError => e
+      org = { "name" => "No Org" }
+    end
     org["name"]
   end
 

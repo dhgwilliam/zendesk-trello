@@ -9,7 +9,7 @@ require 'htmlentities'
 
 get '/' do
   @user = Trello::Member.find("me")
-  redirect to("/board/#{@user.boards.first.id}")
+  redirect to("/board/#{BOARD}")
 end
 
 get '/sync/trello' do
