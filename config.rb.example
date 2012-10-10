@@ -1,8 +1,9 @@
 BASE_URI = "https://yourcompany.zendesk.com"
 
+$:.unshift(File.join('.','lib'))
 require 'httparty'
-require './zendesk.rb'
 require 'ohm'
+require 'zendesk'
 include Trello::Authorization
 
 TRELLO_API_KEY = "key"
