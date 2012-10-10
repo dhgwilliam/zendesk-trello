@@ -54,7 +54,7 @@ DEPENDENCIES
   htmlentities
   httparty
   ohm
-  ruby-trello
+  ruby-trello (= 0.4.2)
   sass
   shotgun
   sinatra
