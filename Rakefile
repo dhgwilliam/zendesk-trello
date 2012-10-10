@@ -1,44 +1,39 @@
+desc "Start redis and run the sync webapp, also provides status"
 task :start do
-  if redis_pid = %x{ps ax | grep redis-server | grep -v grep}.split.first
-    puts "redis is process #{redis_pid}"
-    %x{echo #{redis_pid} > tmp/redis.pid}
-  else
-    %x{/usr/local/bin/redis-server /usr/local/etc/redis.conf > log/redis.log &}
-    %x{echo #{$?.pid} > tmp/redis.pid}
-    puts "started redis process #{cat tmp/redis.pid}"
-  end
-
-  ruby_pid = %x{ps ax | grep index.rb | grep -v grep}.split.first
-  if !ruby_pid.nil?
-    puts "app is process #{ruby_pid}"
-    %x{echo #{ruby_pid} > tmp/ruby.pid}
-  else
-    %x{ruby index.rb &> log/sync.log &}
-    %x{echo #{$?.pid} > tmp/ruby.pid}
-    puts "started ruby process #{cat tmp/ruby.pid}"
-    exec "tail -f log/sync.log"
+  ['redis-server', 'sync.rb'].each do |process|
+    pid_file = File.join(File.dirname(__FILE__), 'tmp', process + '.pid')
+    running_pid = %x{ps ax | grep #{process} | grep -v grep}.split.first
+    if running_pid.nil? then running_pid = false else running_pid = running_pid.chomp end
+    if File.exists?(pid_file)
+      pid = %x{cat #{pid_file}}
+      puts process + " pid is " + pid
+    elsif !File.exists?(pid_file) and running_pid
+      puts process + " is running, creating pid file for " + running_pid
+      %x{echo #{running_pid} > tmp/#{process}.pid}
+    else
+      if process == "redis-server"
+        %x{/usr/local/bin/redis-server /usr/local/etc/redis.conf > log/redis.log &}
+        pid = $?.pid
+      elsif process == "sync.rb"
+        %x{ruby sync.rb &> log/sync.log &}
+        pid = $?.pid + 1
+        puts "starting #{process} with pid #{pid}"
+        %x{echo #{pid} > tmp/#{process}.pid}
+      end
+    end
   end
 end
 
+desc "Stop the sync webapp"
 task :stop do
-  ruby_pid = %x{cat tmp/ruby.pid}
-  puts "killing #{ruby_pid}"
-  %x{kill #{ruby_pid}}
-  %x{rm tmp/ruby.pid}
-end
-
-task :status do
-  redis_pid = %x{cat tmp/redis.pid}
-  ruby_pid = %x{cat tmp/ruby.pid}
-
-  if redis_pid
-    puts "redis pid #{redis_pid}"
+  pid_file = File.join(File.dirname(__FILE__), 'tmp', 'sync.rb.pid')
+  if File.exists?(pid_file)
+    pid = %x{cat #{pid_file}}.chomp
+    puts "killing #{pid}"
+    %x{kill #{pid}}
+    %x{ps ax | grep #{pid} | grep -v grep}
+    %x{rm #{pid_file}}
   else
-    puts "redis is not running"
-  end
-  if ruby_pid
-    puts "ruby pid #{ruby_pid}"
-  else
-    puts "the app is not running"
+    puts "sync.rb not running"
   end
 end
