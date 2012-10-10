@@ -6,7 +6,7 @@ require 'helpers'
 require 'htmlentities'
 require 'trello'
 require 'config'
-require 'card'
+require 'models'
 
 
 get '/' do
