@@ -1,7 +1,11 @@
 require 'rocco/tasks'
 
 desc "Build Rocco Docs with `rake rocco`"
-Rocco::make 'docs/', ['sync.rb', 'lib/*.rb']
+Rocco::make 'docs/', ['sync.rb', 'config.rb.example', 'lib/*.rb'], {
+
+  :language => 'ruby'
+
+}
 
 desc "Start redis and run the sync webapp, also provides status"
 task :start do

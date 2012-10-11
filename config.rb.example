@@ -1,3 +1,4 @@
+# ## BASE_URI
 BASE_URI = "https://yourcompany.zendesk.com"
 
 $:.unshift(File.join('.','lib'))
@@ -6,11 +7,11 @@ require 'ohm'
 require 'zendesk'
 include Trello::Authorization
 
+# ## Constants
 TRELLO_API_KEY = "key"
 TRELLO_APP_SECRET = "secret"
 TRELLO_TOKEN = "token"
 BOARD = "board_id"
-ZENDESK_URL = "https://support.url.com"
 ZENDESK_EMAIL = "e@mail.you"
 ZENDESK_PASSWORD = "password"
 Zendesk::Z_RECENT_VIEW = "/rules/12345.json"
@@ -21,6 +22,8 @@ Zendesk::PENDING_LIST = "Pending Client Response"
 Zendesk::TBD_LIST = "To Be Documented"
 Zendesk::COMPLETE_LIST = "Complete"
 
+# ## Connections to Trello and Zendesk
+# **TODO**: Someday this will be converted to an actual web-based auth process
 Trello::Authorization.const_set :AuthPolicy, OAuthPolicy
 OAuthPolicy.consumer_credential = OAuthCredential.new TRELLO_API_KEY, TRELLO_APP_SECRET
 OAuthPolicy.token = OAuthCredential.new TRELLO_TOKEN, nil
@@ -28,4 +31,7 @@ OAuthPolicy.token = OAuthCredential.new TRELLO_TOKEN, nil
 config = { :email => ZENDESK_EMAIL, :password => ZENDESK_PASSWORD }
 Z = Zendesk.new(config[:email], config[:password])
 
+# ## OHM connection
+# Ohm uses default REDIS connection here, see 
+# [ohm.keyvalue.org](http://ohm.keyvalue.org/#Connecting_to_the_Redis_database) for more details
 OHM = Ohm.connect
