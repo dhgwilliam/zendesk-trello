@@ -1,3 +1,8 @@
+require 'rocco/tasks'
+
+desc "Build Rocco Docs"
+Rocco::make 'docs/', ['sync.rb', 'lib/*.rb']
+
 desc "Start redis and run the sync webapp, also provides status"
 task :start do
   ['redis-server', 'sync.rb'].each do |process|

@@ -1,3 +1,5 @@
+# These are the helper methods that do whatever terrible things Sinatra asks
+# of them. I'm so so sorry, poor helpers
 helpers do
   def sync_trello(board)
     @oboard = get_board(board)

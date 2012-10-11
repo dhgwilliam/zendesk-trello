@@ -1,3 +1,5 @@
+# This class defines how the app interacts with Zendesk. There are very few
+# things we really need to do besides retrieve tickets.
 require 'httparty'
 require 'json'
 
@@ -9,16 +11,24 @@ class Zendesk
     @auth = {:username => u, :password => p}
   end
 
+  # ## ticket(string "1979")
+  # returns the complete ticket hash
   def ticket(id, options={})
     options.merge!({:basic_auth => @auth})
     JSON::parse(self.class.get("/tickets/#{id}.json", options).body)
   end
 
+  # ## tickets_all()
+  # returns an array of all tickets updated in the last 24 hours
+  # as defined by Zendesk View Z_RECENT_VIEW
   def tickets_all(options={})
     options.merge!({:basic_auth => @auth})
     JSON::parse(self.class.get(Z_RECENT_VIEW, options).body)
   end
 
+  # ## org_name(string "22356783")
+  # Returns either the name of organization identified by organization_id or
+  # "No Org" if no such organization exists (or organization_id is not passed)
   def org_name(organization_id, options={})
     options.merge!({:basic_auth => @auth})
     begin
@@ -29,6 +39,10 @@ class Zendesk
     org["name"]
   end
 
+  # ## who_touched(string "1979")
+  # Returns a hash of agents who have updated the Zendesk Ticket with id number
+  #
+  # WIP
   def who_touched(number)
     ticket = self.ticket(number)
     comments = ticket["comments"]
@@ -47,6 +61,14 @@ class Zendesk
     return authors.keep_if{ |k,v| v }
   end
 
+  # ## who_is(string "289470191")
+  # Returns an array of information about Zendesk user author_id  
+  # [ username, user role id]
+  #
+  #     Role          value
+  #     End user      0
+  #     Administrator 2
+  #     Agent         4
   def who_is(author_id, options={})
     options.merge!({:basic_auth => @auth})
     user = JSON::parse(self.class.get("/users/#{author_id}.json", options).body)
@@ -54,6 +76,10 @@ class Zendesk
   end
 
 
+  # ## status(int "1")
+  # Returns an array with  
+  # [ Local status name, [ array of one or more Trello ids of lists that
+  # correspond to this status] ]
   def status(status_id)
     @target_list = []
     case status_id
