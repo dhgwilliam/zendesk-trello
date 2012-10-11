@@ -1,3 +1,4 @@
+# Using [Ohm](http://ohm.keyvalue.org/) to model datatypes and store in redis
 require 'ohm'
 
 class Issue < Ohm::Model
