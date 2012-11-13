@@ -4,7 +4,7 @@
 # getting a little slow.
 #
 # This is the Sinatra routes file that defines the API of the webapp
-$:.unshift('.', File.join('.', 'lib'), File.join('.', 'config'))
+$:.unshift(File.dirname(__FILE__), File.join(File.dirname(__FILE__), 'lib'), File.join(File.dirname(__FILE__), 'config'))
 require 'sinatra'
 require 'haml'
 require 'helpers'
