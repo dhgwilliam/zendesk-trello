@@ -8,6 +8,7 @@ gem 'httparty'
 gem 'ohm'
 gem 'daemons'
 gem 'whenever'
+gem 'thin'
 
 group 'development' do
   gem 'shotgun'
