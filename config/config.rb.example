@@ -1,7 +1,7 @@
 # ## BASE_URI
 BASE_URI = "https://yourcompany.zendesk.com"
 
-$:.unshift(File.join('.','lib'))
+$:.unshift(File.join('..','lib'))
 require 'httparty'
 require 'ohm'
 require 'zendesk'
