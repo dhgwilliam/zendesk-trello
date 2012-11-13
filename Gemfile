@@ -7,6 +7,7 @@ gem 'sass'
 gem 'httparty'
 gem 'ohm'
 gem 'daemons'
+gem 'whenever'
 
 group 'development' do
   gem 'shotgun'
