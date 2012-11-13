@@ -6,6 +6,7 @@ gem 'haml'
 gem 'sass'
 gem 'httparty'
 gem 'ohm'
+gem 'daemons'
 
 group 'development' do
   gem 'shotgun'

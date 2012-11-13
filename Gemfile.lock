@@ -9,6 +9,7 @@ GEM
       multi_json (~> 1.0)
     addressable (2.2.8)
     builder (3.0.0)
+    daemons (1.1.9)
     haml (3.1.4)
     htmlentities (4.3.1)
     httparty (0.8.3)
@@ -50,6 +51,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  daemons
   haml
   htmlentities
   httparty
