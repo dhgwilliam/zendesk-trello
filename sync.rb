@@ -13,6 +13,10 @@ require 'trello'
 require 'config'
 require 'models'
 
+Sync = Rack::Builder.new do
+#\ -p 4567 -s thin -E deployment -D
+	run Sinatra::Application
+end.to_app
 
 # ## /
 # Root route, simply redirects to the primary /board/ url
