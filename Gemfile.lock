@@ -60,7 +60,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  daemons
   haml
   htmlentities
   httparty
