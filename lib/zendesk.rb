@@ -94,10 +94,10 @@ class Zendesk
       @target_list << List.with(:name, PENDING_LIST).trello_id
     when "3"
       @status = "Solved"
-      @target_list = [ List.with(:name, COMPLETE_LIST).trello_id, List.with(:name, TBD_LIST).trello_id ]
+      @target_list = [ List.with(:name, COMPLETE_LIST).trello_id ]
     when "4"
       @status = "Closed"
-      @target_list = [ List.with(:name, COMPLETE_LIST).trello_id, List.with(:name, TBD_LIST).trello_id ]
+      @target_list = [ List.with(:name, COMPLETE_LIST).trello_id ]
     else
       @status = "Unknown"
     end
