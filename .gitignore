@@ -3,3 +3,4 @@ config.rb
 dump.rdb
 launch
 sync.log
+.rbenv*
