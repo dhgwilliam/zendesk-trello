@@ -19,8 +19,8 @@
 
 # Learn more: http://github.com/javan/whenever
 
-set :output, File.join(File.dirname(__FILE__), '..', 'tmp', 'cron.log')
+set :output, File.join(File.expand_path(File.dirname(__FILE__)), '..', 'tmp', 'cron.log')
 
 every 5.minutes do
-  command '*/5 * * * * /usr/bin/curl http://localhost:4567/sync/zendesk &2> /dev/null'
+  command '/usr/bin/curl http://localhost:4567/sync/zendesk'
 end
