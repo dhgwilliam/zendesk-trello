@@ -19,7 +19,6 @@ Zendesk::BACKLOG_LIST = "Back Log"
 Zendesk::ACTIVE_LIST = "Active"
 Zendesk::BLOCKED_LIST = "Blocked"
 Zendesk::PENDING_LIST = "Pending Client Response"
-Zendesk::TBD_LIST = "To Be Documented"
 Zendesk::COMPLETE_LIST = "Complete"
 
 # ## Connections to Trello and Zendesk
