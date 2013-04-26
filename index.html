@@ -1,1 +1,318 @@
-sync.html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>sync.rb</title>
+  <link rel="stylesheet" href="http://jashkenas.github.com/docco/resources/docco.css">
+</head>
+<body>
+<div id='container'>
+  <div id="background"></div>
+  <div id="jump_to">
+    Jump To &hellip;
+    <div id="jump_wrapper">
+      <div id="jump_page">
+          <a class="source" href="config.rb.html">config.rb.example</a>
+          <a class="source" href="lib/helpers.html">helpers.rb</a>
+          <a class="source" href="lib/models.html">models.rb</a>
+          <a class="source" href="lib/zendesk.html">zendesk.rb</a>
+          <a class="source" href="sync.html">sync.rb</a>
+      </div>
+    </div>
+  </div>
+  <table cellspacing=0 cellpadding=0>
+  <thead>
+    <tr>
+      <th class=docs><h1>sync.rb</h1></th>
+      <th class=code></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr id='section-1'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-1">&#182;</a>
+        </div>
+        <p><strong>sync.rb</strong> is a Sinatra-based webapp that acts as a sync connector between 
+<a href="http://www.zendesk.com">Zendesk</a> and <a href="http://trello.com">Trello</a>
+The whole app would benefit from some caching and a resque worker queue, since it&rsquo;s
+getting a little slow.</p>
+
+<p>This is the Sinatra routes file that defines the API of the webapp</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="vg">$:</span><span class="o">.</span><span class="n">unshift</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="no">File</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="s1">&#39;lib&#39;</span><span class="p">))</span>
+<span class="nb">require</span> <span class="s1">&#39;sinatra&#39;</span>
+<span class="nb">require</span> <span class="s1">&#39;haml&#39;</span>
+<span class="nb">require</span> <span class="s1">&#39;helpers&#39;</span>
+<span class="nb">require</span> <span class="s1">&#39;htmlentities&#39;</span>
+<span class="nb">require</span> <span class="s1">&#39;trello&#39;</span>
+<span class="nb">require</span> <span class="s1">&#39;config&#39;</span>
+<span class="nb">require</span> <span class="s1">&#39;models&#39;</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-/'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-/">&#182;</a>
+        </div>
+        <h2>/</h2>
+
+<p>Root route, simply redirects to the primary /board/ url</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="n">get</span> <span class="s1">&#39;/&#39;</span> <span class="k">do</span>
+  <span class="vi">@user</span> <span class="o">=</span> <span class="no">Trello</span><span class="o">::</span><span class="no">Member</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;me&quot;</span><span class="p">)</span>
+  <span class="n">redirect</span> <span class="n">to</span><span class="p">(</span><span class="s2">&quot;/board/</span><span class="si">#{</span><span class="no">BOARD</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-/sync/trello'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-/sync/trello">&#182;</a>
+        </div>
+        <h2>/sync/trello</h2>
+
+<p>This appears to be required to insert existing trello information into the db 
+and I can&rsquo;t really see any other reason for it</p>
+
+<p><strong>TODO</strong>: convert this route to a rake or resque task</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="n">get</span> <span class="s1">&#39;/sync/trello&#39;</span> <span class="k">do</span>
+  <span class="n">sync_trello</span><span class="p">(</span><span class="no">BOARD</span><span class="p">)</span>
+  <span class="n">redirect</span> <span class="n">to</span><span class="p">(</span><span class="s2">&quot;/board/</span><span class="si">#{</span><span class="no">BOARD</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-/sync/zendesk'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-/sync/zendesk">&#182;</a>
+        </div>
+        <h2>/sync/zendesk</h2>
+
+<p>Z.tickets_all loads all tickets from the RECENT view, so loading 
+this URL causes local updates to every ticket updated in the last 24 hours</p>
+
+<p><strong>TODO</strong>: convert this route to a rake or resque task</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="n">get</span> <span class="s1">&#39;/sync/zendesk&#39;</span> <span class="k">do</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-5'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-5">&#182;</a>
+        </div>
+        <p>nice_id may not still be supported, and get_issue is a dumb method name</p>
+
+<p><strong>TODO</strong>: rename get_issue to something more meaningful</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>  <span class="n">Z</span><span class="o">.</span><span class="n">tickets_all</span><span class="o">.</span><span class="n">each</span> <span class="p">{</span> <span class="o">|</span><span class="n">ticket</span><span class="o">|</span> <span class="n">get_issue</span><span class="p">(</span><span class="n">ticket</span><span class="o">[</span><span class="s2">&quot;nice_id&quot;</span><span class="o">]</span><span class="p">)</span> <span class="p">}</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-6'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-6">&#182;</a>
+        </div>
+        <p>this redirect is also wasteful</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>  <span class="n">redirect</span> <span class="n">to</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+<span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-/board/4ed7e27fe6abb2517a21383d'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-/board/4ed7e27fe6abb2517a21383d">&#182;</a>
+        </div>
+        <h2>/board/4ed7e27fe6abb2517a21383d</h2>
+
+<p>Displays the board but also causes a board to be loaded from Trello 
+if the board with :trello_id hasn&rsquo;t been loaded yet</p>
+
+<p><strong>TODO</strong>: convert redirect to resque task</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="n">get</span> <span class="s1">&#39;/board/:trello_id&#39;</span> <span class="k">do</span>
+  <span class="k">unless</span> <span class="no">Board</span><span class="o">.</span><span class="n">with</span><span class="p">(</span><span class="ss">:trello_id</span><span class="p">,</span> <span class="n">params</span><span class="o">[</span><span class="ss">:trello_id</span><span class="o">]</span><span class="p">)</span>
+    <span class="n">redirect</span> <span class="n">to</span><span class="p">(</span><span class="s2">&quot;/board/new/</span><span class="si">#{</span><span class="n">params</span><span class="o">[</span><span class="ss">:trello_id</span><span class="o">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+  <span class="k">end</span>
+  <span class="vi">@board</span> <span class="o">=</span> <span class="no">Board</span><span class="o">.</span><span class="n">with</span><span class="p">(</span><span class="ss">:trello_id</span><span class="p">,</span> <span class="n">params</span><span class="o">[</span><span class="ss">:trello_id</span><span class="o">]</span><span class="p">)</span>
+  <span class="n">haml</span> <span class="ss">:cards</span>
+<span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-/board/new/4ed7e27fe6abb2517a21383d'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-/board/new/4ed7e27fe6abb2517a21383d">&#182;</a>
+        </div>
+        <h2>/board/new/4ed7e27fe6abb2517a21383d</h2>
+
+<p>Pulls information from Trello to populate the local database</p>
+
+<p><strong>TODO</strong>: convert sync_trello rake or resque task</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="n">get</span> <span class="s1">&#39;/board/new/:trello_id&#39;</span> <span class="k">do</span>
+  <span class="n">sync_trello</span><span class="p">(</span><span class="n">params</span><span class="o">[</span><span class="ss">:trello_id</span><span class="o">]</span><span class="p">)</span>
+  <span class="n">redirect</span> <span class="n">to</span><span class="p">(</span><span class="s2">&quot;/board/</span><span class="si">#{</span><span class="n">params</span><span class="o">[</span><span class="ss">:trello_id</span><span class="o">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-/issue/1979'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-/issue/1979">&#182;</a>
+        </div>
+        <h2>/issue/1979</h2>
+
+<p>Displays details for local issue. If the issue doesn&rsquo;t exist yet, it pulls
+the ticket from Zendesk. :number appears to correlate to the Zendesk nice_id</p>
+
+<p><strong>TODO</strong>: convert redirect to trigger resque task</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="n">get</span> <span class="s1">&#39;/issue/:number&#39;</span> <span class="k">do</span>
+  <span class="k">if</span> <span class="no">Issue</span><span class="o">.</span><span class="n">with</span><span class="p">(</span><span class="ss">:number</span><span class="p">,</span> <span class="n">params</span><span class="o">[</span><span class="ss">:number</span><span class="o">]</span><span class="p">)</span><span class="o">.</span><span class="n">nil?</span>
+    <span class="n">redirect</span> <span class="n">to</span><span class="p">(</span><span class="s2">&quot;/issue/new/zendesk/</span><span class="si">#{</span><span class="n">params</span><span class="o">[</span><span class="ss">:number</span><span class="o">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+  <span class="k">end</span>
+  <span class="vi">@issue</span> <span class="o">=</span> <span class="no">Issue</span><span class="o">.</span><span class="n">with</span><span class="p">(</span><span class="ss">:number</span><span class="p">,</span> <span class="n">params</span><span class="o">[</span><span class="ss">:number</span><span class="o">]</span><span class="p">)</span>
+  <span class="vi">@status</span> <span class="o">=</span> <span class="n">Z</span><span class="o">.</span><span class="n">status</span><span class="p">(</span><span class="vi">@issue</span><span class="o">.</span><span class="n">status</span><span class="p">)</span><span class="o">.</span><span class="n">first</span>
+  <span class="n">haml</span> <span class="ss">:card</span>
+<span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-/issue/new/zendesk/1979'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-/issue/new/zendesk/1979">&#182;</a>
+        </div>
+        <h2>/issue/new/zendesk/1979</h2>
+
+<p>Reload data from Zendesk for Zendesk ticket with id == :number</p>
+
+<p><strong>TODO</strong>: convert this route to resque task</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="n">get</span> <span class="s1">&#39;/issue/new/zendesk/:number&#39;</span> <span class="k">do</span>
+  <span class="vi">@issue</span> <span class="o">=</span> <span class="n">get_issue</span><span class="p">(</span><span class="n">params</span><span class="o">[</span><span class="ss">:number</span><span class="o">]</span><span class="p">)</span>
+  <span class="n">redirect</span> <span class="n">to</span><span class="p">(</span><span class="s2">&quot;/board/</span><span class="si">#{</span><span class="no">BOARD</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-/issue/delete/1979'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-/issue/delete/1979">&#182;</a>
+        </div>
+        <h2>/issue/delete/1979</h2>
+
+<p>Triggers a delete of local issue object</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="n">get</span> <span class="s1">&#39;/issue/delete/:number&#39;</span> <span class="k">do</span>
+  <span class="no">Issue</span><span class="o">.</span><span class="n">with</span><span class="p">(</span><span class="ss">:number</span><span class="p">,</span> <span class="n">params</span><span class="o">[</span><span class="ss">:number</span><span class="o">]</span><span class="p">)</span><span class="o">.</span><span class="n">delete</span>
+  <span class="n">redirect</span> <span class="n">back</span>
+<span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-/list/4f4e8539b7b81632280c9dd8'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-/list/4f4e8539b7b81632280c9dd8">&#182;</a>
+        </div>
+        <h2>/list/4f4e8539b7b81632280c9dd8</h2>
+
+<p>Display all issues associated with cards in Trello list :list</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="n">get</span> <span class="s1">&#39;/list/:list&#39;</span> <span class="k">do</span>
+  <span class="vi">@list</span> <span class="o">=</span> <span class="no">List</span><span class="o">.</span><span class="n">with</span><span class="p">(</span><span class="ss">:trello_id</span><span class="p">,</span> <span class="n">params</span><span class="o">[</span><span class="ss">:list</span><span class="o">]</span><span class="p">)</span>
+  <span class="vi">@board</span> <span class="o">=</span> <span class="vi">@list</span><span class="o">.</span><span class="n">board</span>
+  <span class="n">haml</span> <span class="ss">:list</span>
+<span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-/list/new/4f4e8539b7b81632280c9dd8'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-/list/new/4f4e8539b7b81632280c9dd8">&#182;</a>
+        </div>
+        <h2>/list/new/4f4e8539b7b81632280c9dd8</h2>
+
+<p>Pull a list from Trello to local db and redirect to the list </p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="n">get</span> <span class="s1">&#39;/list/new/:trello_id&#39;</span> <span class="k">do</span>
+  <span class="n">get_list</span><span class="p">(</span><span class="n">params</span><span class="o">[</span><span class="ss">:trello_id</span><span class="o">]</span><span class="p">)</span>
+  <span class="n">redirect</span> <span class="n">to</span><span class="p">(</span><span class="s2">&quot;/list/</span><span class="si">#{</span><span class="n">params</span><span class="o">[</span><span class="ss">:trello_id</span><span class="o">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-/who/1979'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-/who/1979">&#182;</a>
+        </div>
+        <h2>/who/1979</h2>
+
+<p>Displays all the Zendesk users who &ldquo;touched&rdquo; a Zendesk ticket</p>
+
+<p><strong>TODO</strong>: figure out the correct nouns and verbs for this route
+<strong>WIP</strong></p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="n">get</span> <span class="s1">&#39;/who/:number&#39;</span> <span class="k">do</span>
+  <span class="n">authors</span> <span class="o">=</span> <span class="n">Z</span><span class="o">.</span><span class="n">who_touched</span><span class="p">(</span><span class="n">params</span><span class="o">[</span><span class="ss">:number</span><span class="o">]</span><span class="p">)</span>
+  <span class="n">authors</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">zendesk_id</span><span class="p">,</span> <span class="nb">name</span><span class="o">|</span>
+    <span class="k">if</span> <span class="no">User</span><span class="o">.</span><span class="n">with</span><span class="p">(</span><span class="ss">:zendesk_id</span><span class="p">,</span> <span class="n">zendesk_id</span><span class="p">)</span><span class="o">.</span><span class="n">nil?</span>
+      <span class="no">User</span><span class="o">.</span><span class="n">create</span> <span class="ss">:name</span> <span class="o">=&gt;</span> <span class="nb">name</span><span class="p">,</span> <span class="ss">:zendesk_id</span> <span class="o">=&gt;</span> <span class="n">zendesk_id</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+  <span class="s2">&quot;</span><span class="si">#{</span><span class="n">authors</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-/user/delete/166929761'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-/user/delete/166929761">&#182;</a>
+        </div>
+        <h2>/user/delete/166929761</h2>
+
+<p>Delete local User object associated with Zendesk user :id</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="n">get</span> <span class="s1">&#39;/user/delete/:id&#39;</span> <span class="k">do</span>
+  <span class="no">User</span><span class="o">[</span><span class="n">params</span><span class="o">[</span><span class="ss">:id</span><span class="o">]].</span><span class="n">delete</span>
+<span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-/zendesk/1979'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-/zendesk/1979">&#182;</a>
+        </div>
+        <h2>/zendesk/1979</h2>
+
+<p>Display JSON of Zendesk ticket :id</p>
+
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="n">get</span> <span class="s1">&#39;/zendesk/:id&#39;</span> <span class="k">do</span>
+  <span class="n">coder</span> <span class="o">=</span> <span class="no">HTMLEntities</span><span class="o">.</span><span class="n">new</span>
+  <span class="n">coder</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">Z</span><span class="o">.</span><span class="n">ticket</span><span class="p">(</span><span class="n">params</span><span class="o">[</span><span class="ss">:id</span><span class="o">]</span><span class="p">))</span>
+<span class="k">end</span></pre></div>
+      </td>
+    </tr>
+  </table>
+</div>
+</body>
