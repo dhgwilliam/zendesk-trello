@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>zendesk.rb</title>
+  <link rel="stylesheet" href="http://jashkenas.github.com/docco/resources/docco.css">
+</head>
+<body>
+<div id='container'>
+  <div id="background"></div>
+  <div id="jump_to">
+    Jump To &hellip;
+    <div id="jump_wrapper">
+      <div id="jump_page">
+          <a class="source" href="../config.rb.html">config.rb.example</a>
+          <a class="source" href="helpers.html">helpers.rb</a>
+          <a class="source" href="models.html">models.rb</a>
+          <a class="source" href="zendesk.html">zendesk.rb</a>
+          <a class="source" href="../sync.html">sync.rb</a>
+      </div>
+    </div>
+  </div>
+  <table cellspacing=0 cellpadding=0>
+  <thead>
+    <tr>
+      <th class=docs><h1>zendesk.rb</h1></th>
+      <th class=code></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr id='section-1'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-1">&#182;</a>
+        </div>
+        <p>This class defines how the app interacts with Zendesk. There are very few
+things we really need to do besides retrieve tickets.</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="nb">require</span> <span class="s1">&#39;httparty&#39;</span>
+<span class="nb">require</span> <span class="s1">&#39;json&#39;</span>
+
+<span class="k">class</span> <span class="nc">Zendesk</span>
+  <span class="kp">include</span> <span class="no">HTTParty</span>
+  <span class="n">base_uri</span> <span class="no">Zendesk</span><span class="o">::</span><span class="no">BASE_URI</span>
+
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="nb">p</span><span class="p">)</span>
+    <span class="vi">@auth</span> <span class="o">=</span> <span class="p">{</span><span class="ss">:username</span> <span class="o">=&gt;</span> <span class="n">u</span><span class="p">,</span> <span class="ss">:password</span> <span class="o">=&gt;</span> <span class="nb">p</span><span class="p">}</span>
+  <span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-ticket(string_&amp;ldquo;1979&amp;rdquo;)'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-ticket(string_&amp;ldquo;1979&amp;rdquo;)">&#182;</a>
+        </div>
+        <h2>ticket(string &ldquo;1979&rdquo;)</h2>
+
+<p>returns the complete ticket hash</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>  <span class="k">def</span> <span class="nf">ticket</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">{})</span>
+    <span class="n">options</span><span class="o">.</span><span class="n">merge!</span><span class="p">({</span><span class="ss">:basic_auth</span> <span class="o">=&gt;</span> <span class="vi">@auth</span><span class="p">})</span>
+    <span class="no">JSON</span><span class="o">::</span><span class="n">parse</span><span class="p">(</span><span class="nb">self</span><span class="o">.</span><span class="n">class</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/tickets/</span><span class="si">#{</span><span class="nb">id</span><span class="si">}</span><span class="s2">.json&quot;</span><span class="p">,</span> <span class="n">options</span><span class="p">)</span><span class="o">.</span><span class="n">body</span><span class="p">)</span>
+  <span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-tickets_all()'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-tickets_all()">&#182;</a>
+        </div>
+        <h2>tickets_all()</h2>
+
+<p>returns an array of all tickets updated in the last 24 hours
+as defined by Zendesk View Z<em>RECENT</em>VIEW</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>  <span class="k">def</span> <span class="nf">tickets_all</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="p">{})</span>
+    <span class="n">options</span><span class="o">.</span><span class="n">merge!</span><span class="p">({</span><span class="ss">:basic_auth</span> <span class="o">=&gt;</span> <span class="vi">@auth</span><span class="p">})</span>
+    <span class="no">JSON</span><span class="o">::</span><span class="n">parse</span><span class="p">(</span><span class="nb">self</span><span class="o">.</span><span class="n">class</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="no">Z_RECENT_VIEW</span><span class="p">,</span> <span class="n">options</span><span class="p">)</span><span class="o">.</span><span class="n">body</span><span class="p">)</span>
+  <span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-org_name(string_&amp;ldquo;22356783&amp;rdquo;)'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-org_name(string_&amp;ldquo;22356783&amp;rdquo;)">&#182;</a>
+        </div>
+        <h2>org_name(string &ldquo;22356783&rdquo;)</h2>
+
+<p>Returns either the name of organization identified by organization<em>id or
+&ldquo;No Org&rdquo; if no such organization exists (or organization</em>id is not passed)</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>  <span class="k">def</span> <span class="nf">org_name</span><span class="p">(</span><span class="n">organization_id</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">{})</span>
+    <span class="n">options</span><span class="o">.</span><span class="n">merge!</span><span class="p">({</span><span class="ss">:basic_auth</span> <span class="o">=&gt;</span> <span class="vi">@auth</span><span class="p">})</span>
+    <span class="k">begin</span>
+      <span class="n">org</span> <span class="o">=</span> <span class="no">JSON</span><span class="o">::</span><span class="n">parse</span><span class="p">(</span><span class="nb">self</span><span class="o">.</span><span class="n">class</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/organizations/</span><span class="si">#{</span><span class="n">organization_id</span><span class="si">}</span><span class="s2">.json&quot;</span><span class="p">,</span> <span class="n">options</span><span class="p">)</span><span class="o">.</span><span class="n">body</span><span class="p">)</span>
+    <span class="k">rescue</span> <span class="no">JSON</span><span class="o">::</span><span class="no">ParserError</span> <span class="o">=&gt;</span> <span class="n">e</span>
+      <span class="n">org</span> <span class="o">=</span> <span class="p">{</span> <span class="s2">&quot;name&quot;</span> <span class="o">=&gt;</span> <span class="s2">&quot;No Org&quot;</span> <span class="p">}</span>
+    <span class="k">end</span>
+    <span class="n">org</span><span class="o">[</span><span class="s2">&quot;name&quot;</span><span class="o">]</span>
+  <span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-who_touched(string_&amp;ldquo;1979&amp;rdquo;)'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-who_touched(string_&amp;ldquo;1979&amp;rdquo;)">&#182;</a>
+        </div>
+        <h2>who_touched(string &ldquo;1979&rdquo;)</h2>
+
+<p>Returns a hash of agents who have updated the Zendesk Ticket with id number</p>
+
+<p>WIP</p>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>  <span class="k">def</span> <span class="nf">who_touched</span><span class="p">(</span><span class="n">number</span><span class="p">)</span>
+    <span class="n">ticket</span> <span class="o">=</span> <span class="nb">self</span><span class="o">.</span><span class="n">ticket</span><span class="p">(</span><span class="n">number</span><span class="p">)</span>
+    <span class="n">comments</span> <span class="o">=</span> <span class="n">ticket</span><span class="o">[</span><span class="s2">&quot;comments&quot;</span><span class="o">]</span>
+    <span class="n">authors</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">comments</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">comment</span><span class="o">|</span>
+      <span class="k">unless</span> <span class="n">authors</span><span class="o">.</span><span class="n">has_key?</span><span class="p">(</span><span class="n">comment</span><span class="o">[</span><span class="s2">&quot;author_id&quot;</span><span class="o">]</span><span class="p">)</span>
+        <span class="n">authors</span><span class="o">[</span><span class="n">comment</span><span class="o">[</span><span class="s2">&quot;author_id&quot;</span><span class="o">]]</span> <span class="o">||=</span>  <span class="kp">nil</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+    <span class="n">authors</span><span class="o">.</span><span class="n">each_key</span> <span class="k">do</span> <span class="o">|</span><span class="n">author_id</span><span class="o">|</span>
+      <span class="n">author</span> <span class="o">=</span> <span class="nb">self</span><span class="o">.</span><span class="n">who_is</span><span class="p">(</span><span class="n">author_id</span><span class="p">)</span>
+      <span class="k">if</span> <span class="n">author</span><span class="o">.</span><span class="n">last</span> <span class="o">!=</span> <span class="mi">0</span>
+        <span class="n">authors</span><span class="o">[</span><span class="n">author_id</span><span class="o">]</span> <span class="o">=</span> <span class="n">author</span><span class="o">.</span><span class="n">first</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+    <span class="k">return</span> <span class="n">authors</span><span class="o">.</span><span class="n">keep_if</span><span class="p">{</span> <span class="o">|</span><span class="n">k</span><span class="p">,</span><span class="n">v</span><span class="o">|</span> <span class="n">v</span> <span class="p">}</span>
+  <span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-who_is(string_&amp;ldquo;289470191&amp;rdquo;)'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-who_is(string_&amp;ldquo;289470191&amp;rdquo;)">&#182;</a>
+        </div>
+        <h2>who_is(string &ldquo;289470191&rdquo;)</h2>
+
+<p>Returns an array of information about Zendesk user author_id<br>
+[ username, user role id]</p>
+
+<pre><code>Role          value
+End user      0
+Administrator 2
+Agent         4
+</code></pre>
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>  <span class="k">def</span> <span class="nf">who_is</span><span class="p">(</span><span class="n">author_id</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">{})</span>
+    <span class="n">options</span><span class="o">.</span><span class="n">merge!</span><span class="p">({</span><span class="ss">:basic_auth</span> <span class="o">=&gt;</span> <span class="vi">@auth</span><span class="p">})</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="no">JSON</span><span class="o">::</span><span class="n">parse</span><span class="p">(</span><span class="nb">self</span><span class="o">.</span><span class="n">class</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/users/</span><span class="si">#{</span><span class="n">author_id</span><span class="si">}</span><span class="s2">.json&quot;</span><span class="p">,</span> <span class="n">options</span><span class="p">)</span><span class="o">.</span><span class="n">body</span><span class="p">)</span>
+    <span class="k">return</span> <span class="o">[</span> <span class="n">user</span><span class="o">[</span><span class="s2">&quot;name&quot;</span><span class="o">]</span><span class="p">,</span> <span class="n">user</span><span class="o">[</span><span class="s2">&quot;roles&quot;</span><span class="o">]</span> <span class="o">]</span>
+  <span class="k">end</span></pre></div>
+      </td>
+    </tr>
+    <tr id='section-status(int_&amp;ldquo;1&amp;rdquo;)'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-status(int_&amp;ldquo;1&amp;rdquo;)">&#182;</a>
+        </div>
+        <h2>status(int &ldquo;1&rdquo;)</h2>
+
+<p>Returns an array with<br>
+[ Local status name, [ array of one or more Trello ids of lists that
+correspond to this status] ]</p>
+
+      </td>
+      <td class=code>
+        <div class='highlight'><pre>  <span class="k">def</span> <span class="nf">status</span><span class="p">(</span><span class="n">status_id</span><span class="p">)</span>
+    <span class="vi">@target_list</span> <span class="o">=</span> <span class="o">[]</span>
+    <span class="k">case</span> <span class="n">status_id</span>
+    <span class="k">when</span> <span class="s2">&quot;0&quot;</span>
+      <span class="vi">@status</span> <span class="o">=</span> <span class="s2">&quot;New&quot;</span>
+      <span class="vi">@target_list</span> <span class="o">&lt;&lt;</span> <span class="no">List</span><span class="o">.</span><span class="n">with</span><span class="p">(</span><span class="ss">:name</span><span class="p">,</span> <span class="no">BACKLOG_LIST</span><span class="p">)</span><span class="o">.</span><span class="n">trello_id</span>
+    <span class="k">when</span> <span class="s2">&quot;1&quot;</span>
+      <span class="vi">@status</span> <span class="o">=</span> <span class="s2">&quot;Open&quot;</span>
+      <span class="vi">@target_list</span> <span class="o">=</span> <span class="o">[</span> <span class="no">List</span><span class="o">.</span><span class="n">with</span><span class="p">(</span><span class="ss">:name</span><span class="p">,</span> <span class="no">ACTIVE_LIST</span><span class="p">)</span><span class="o">.</span><span class="n">trello_id</span><span class="p">,</span> <span class="no">List</span><span class="o">.</span><span class="n">with</span><span class="p">(</span><span class="ss">:name</span><span class="p">,</span> <span class="no">BLOCKED_LIST</span><span class="p">)</span><span class="o">.</span><span class="n">trello_id</span><span class="o">]</span>
+    <span class="k">when</span> <span class="s2">&quot;2&quot;</span>
+      <span class="vi">@status</span> <span class="o">=</span> <span class="s2">&quot;Pending&quot;</span>
+      <span class="vi">@target_list</span> <span class="o">&lt;&lt;</span> <span class="no">List</span><span class="o">.</span><span class="n">with</span><span class="p">(</span><span class="ss">:name</span><span class="p">,</span> <span class="no">PENDING_LIST</span><span class="p">)</span><span class="o">.</span><span class="n">trello_id</span>
+    <span class="k">when</span> <span class="s2">&quot;3&quot;</span>
+      <span class="vi">@status</span> <span class="o">=</span> <span class="s2">&quot;Solved&quot;</span>
+      <span class="vi">@target_list</span> <span class="o">=</span> <span class="o">[</span> <span class="no">List</span><span class="o">.</span><span class="n">with</span><span class="p">(</span><span class="ss">:name</span><span class="p">,</span> <span class="no">COMPLETE_LIST</span><span class="p">)</span><span class="o">.</span><span class="n">trello_id</span><span class="p">,</span> <span class="no">List</span><span class="o">.</span><span class="n">with</span><span class="p">(</span><span class="ss">:name</span><span class="p">,</span> <span class="no">TBD_LIST</span><span class="p">)</span><span class="o">.</span><span class="n">trello_id</span> <span class="o">]</span>
+    <span class="k">when</span> <span class="s2">&quot;4&quot;</span>
+      <span class="vi">@status</span> <span class="o">=</span> <span class="s2">&quot;Closed&quot;</span>
+      <span class="vi">@target_list</span> <span class="o">=</span> <span class="o">[</span> <span class="no">List</span><span class="o">.</span><span class="n">with</span><span class="p">(</span><span class="ss">:name</span><span class="p">,</span> <span class="no">COMPLETE_LIST</span><span class="p">)</span><span class="o">.</span><span class="n">trello_id</span><span class="p">,</span> <span class="no">List</span><span class="o">.</span><span class="n">with</span><span class="p">(</span><span class="ss">:name</span><span class="p">,</span> <span class="no">TBD_LIST</span><span class="p">)</span><span class="o">.</span><span class="n">trello_id</span> <span class="o">]</span>
+    <span class="k">else</span>
+      <span class="vi">@status</span> <span class="o">=</span> <span class="s2">&quot;Unknown&quot;</span>
+    <span class="k">end</span>
+    <span class="k">return</span> <span class="o">[</span> <span class="vi">@status</span><span class="p">,</span> <span class="vi">@target_list</span> <span class="o">]</span>
+  <span class="k">end</span>
+<span class="k">end</span></pre></div>
+      </td>
+    </tr>
+  </table>
+</div>
+</body>

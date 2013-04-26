@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>models.rb</title>
+  <link rel="stylesheet" href="http://jashkenas.github.com/docco/resources/docco.css">
+</head>
+<body>
+<div id='container'>
+  <div id="background"></div>
+  <div id="jump_to">
+    Jump To &hellip;
+    <div id="jump_wrapper">
+      <div id="jump_page">
+          <a class="source" href="../config.rb.html">config.rb.example</a>
+          <a class="source" href="helpers.html">helpers.rb</a>
+          <a class="source" href="models.html">models.rb</a>
+          <a class="source" href="zendesk.html">zendesk.rb</a>
+          <a class="source" href="../sync.html">sync.rb</a>
+      </div>
+    </div>
+  </div>
+  <table cellspacing=0 cellpadding=0>
+  <thead>
+    <tr>
+      <th class=docs><h1>models.rb</h1></th>
+      <th class=code></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr id='section-1'>
+      <td class=docs>
+        <div class="pilwrap">
+          <a class="pilcrow" href="#section-1">&#182;</a>
+        </div>
+        <p>Using <a href="http://ohm.keyvalue.org/">Ohm</a> to model datatypes and store in redis</p>
+
+      </td>
+      <td class=code>
+        <div class='highlight'><pre><span class="nb">require</span> <span class="s1">&#39;ohm&#39;</span>
+
+<span class="k">class</span> <span class="nc">Issue</span> <span class="o">&lt;</span> <span class="no">Ohm</span><span class="o">::</span><span class="no">Model</span>
+  <span class="n">attribute</span> <span class="ss">:number</span>
+  <span class="n">attribute</span> <span class="ss">:trello_id</span>
+  <span class="n">attribute</span> <span class="ss">:oname</span>
+  <span class="n">attribute</span> <span class="ss">:zname</span>
+  <span class="n">attribute</span> <span class="ss">:timestamp</span>
+  <span class="n">attribute</span> <span class="ss">:last_json</span>
+  <span class="n">attribute</span> <span class="ss">:status</span>
+
+  <span class="n">reference</span> <span class="ss">:list</span><span class="p">,</span> <span class="ss">:List</span>
+  <span class="n">reference</span> <span class="ss">:board</span><span class="p">,</span> <span class="ss">:Board</span>
+
+  <span class="n">reference</span> <span class="ss">:user</span><span class="p">,</span> <span class="ss">:User</span>
+  <span class="n">collection</span> <span class="ss">:user</span><span class="p">,</span> <span class="ss">:User</span>
+
+  <span class="n">unique</span> <span class="ss">:number</span>
+
+  <span class="n">index</span> <span class="ss">:number</span>
+  <span class="n">index</span> <span class="ss">:trello_id</span>
+
+  <span class="k">def</span> <span class="nf">validate</span>
+    <span class="n">assert_present</span> <span class="ss">:number</span>
+    <span class="n">assert_numeric</span> <span class="ss">:number</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">List</span> <span class="o">&lt;</span> <span class="no">Ohm</span><span class="o">::</span><span class="no">Model</span>
+  <span class="n">attribute</span> <span class="ss">:name</span>
+  <span class="n">attribute</span> <span class="ss">:trello_id</span>
+  <span class="n">attribute</span> <span class="ss">:status</span>
+
+  <span class="n">reference</span> <span class="ss">:board</span><span class="p">,</span> <span class="ss">:Board</span>
+  <span class="n">collection</span> <span class="ss">:issues</span><span class="p">,</span> <span class="ss">:Issue</span>
+
+  <span class="n">unique</span> <span class="ss">:trello_id</span>
+  <span class="n">unique</span> <span class="ss">:name</span>
+
+  <span class="n">index</span> <span class="ss">:name</span>
+  <span class="n">index</span> <span class="ss">:trello_id</span>
+
+  <span class="k">def</span> <span class="nf">validate</span>
+    <span class="n">assert_present</span> <span class="ss">:name</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">Board</span> <span class="o">&lt;</span> <span class="no">Ohm</span><span class="o">::</span><span class="no">Model</span>
+  <span class="n">attribute</span> <span class="ss">:name</span>
+  <span class="n">attribute</span> <span class="ss">:trello_id</span>
+
+  <span class="n">unique</span> <span class="ss">:trello_id</span>
+  <span class="n">index</span> <span class="ss">:trello_id</span>
+  <span class="n">index</span> <span class="ss">:name</span>
+
+  <span class="n">collection</span> <span class="ss">:lists</span><span class="p">,</span> <span class="ss">:List</span>
+  <span class="n">collection</span> <span class="ss">:issues</span><span class="p">,</span> <span class="ss">:Issue</span>
+
+  <span class="k">def</span> <span class="nf">validate</span>
+    <span class="n">assert_present</span> <span class="ss">:trello_id</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">User</span> <span class="o">&lt;</span> <span class="no">Ohm</span><span class="o">::</span><span class="no">Model</span>
+  <span class="n">attribute</span> <span class="ss">:name</span>
+  <span class="n">attribute</span> <span class="ss">:zendesk_id</span>
+  <span class="n">attribute</span> <span class="ss">:trello_id</span>
+
+  <span class="n">collection</span> <span class="ss">:issues</span><span class="p">,</span> <span class="ss">:Issue</span>
+  <span class="n">reference</span> <span class="ss">:issues</span><span class="p">,</span> <span class="ss">:Issue</span>
+<span class="k">end</span></pre></div>
+      </td>
+    </tr>
+  </table>
+</div>
+</body>
