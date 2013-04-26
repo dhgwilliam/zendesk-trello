@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>schedule.rb</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page">
+            
+              
+              <a class="source" href="config.html">
+                config.rb
+              </a>
+            
+              
+              <a class="source" href="schedule.html">
+                schedule.rb
+              </a>
+            
+              
+              <a class="source" href="helpers.html">
+                helpers.rb
+              </a>
+            
+              
+              <a class="source" href="models.html">
+                models.rb
+              </a>
+            
+              
+              <a class="source" href="zendesk.html">
+                zendesk.rb
+              </a>
+            
+              
+              <a class="source" href="sync.html">
+                sync.rb
+              </a>
+            
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>schedule.rb</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              <p>Use this file to easily define all of your cron jobs.</p>
+<p>It&#39;s helpful, but not entirely necessary to understand cron before proceeding.
+<a href="http://en.wikipedia.org/wiki/Cron">http://en.wikipedia.org/wiki/Cron</a></p>
+<p>Example:</p>
+<p>set :output, &quot;/path/to/my/cron_log.log&quot;</p>
+<p>every 2.hours do
+  command &quot;/usr/bin/some_great_command&quot;
+  runner &quot;MyModel.some_method&quot;
+  rake &quot;some:great:rake:task&quot;
+end</p>
+<p>every 4.days do
+  runner &quot;AnotherModel.prune_old_records&quot;
+end</p>
+<p>Learn more: <a href="http://github.com/javan/whenever">http://github.com/javan/whenever</a></p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>set <span class="symbol">:output</span>, <span class="constant">File</span>.join(<span class="constant">File</span>.expand_path(<span class="constant">File</span>.dirname(__FILE_<span class="number">_</span>)), <span class="string">'..'</span>, <span class="string">'tmp'</span>, <span class="string">'cron.log'</span>)
+
+every <span class="number">5</span>.minutes <span class="keyword">do</span>
+  command <span class="string">'/usr/bin/curl http://localhost:4567/sync/zendesk'</span>
+<span class="keyword">end</span></pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

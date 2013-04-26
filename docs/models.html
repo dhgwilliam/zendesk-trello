@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>models.rb</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page">
+            
+              
+              <a class="source" href="config.html">
+                config.rb
+              </a>
+            
+              
+              <a class="source" href="schedule.html">
+                schedule.rb
+              </a>
+            
+              
+              <a class="source" href="helpers.html">
+                helpers.rb
+              </a>
+            
+              
+              <a class="source" href="models.html">
+                models.rb
+              </a>
+            
+              
+              <a class="source" href="zendesk.html">
+                zendesk.rb
+              </a>
+            
+              
+              <a class="source" href="sync.html">
+                sync.rb
+              </a>
+            
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>models.rb</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              <p>Using <a href="http://ohm.keyvalue.org/">Ohm</a> to model datatypes and store in redis</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="keyword">require</span> <span class="string">'ohm'</span>
+
+<span class="class"><span class="keyword">class</span> <span class="title">Issue</span> <span class="inheritance">&lt; <span class="parent">Ohm::Model</span></span></span>
+  attribute <span class="symbol">:number</span>
+  attribute <span class="symbol">:trello_id</span>
+  attribute <span class="symbol">:oname</span>
+  attribute <span class="symbol">:zname</span>
+  attribute <span class="symbol">:timestamp</span>
+  attribute <span class="symbol">:last_json</span>
+  attribute <span class="symbol">:status</span>
+
+  reference <span class="symbol">:list</span>, <span class="symbol">:List</span>
+  reference <span class="symbol">:board</span>, <span class="symbol">:Board</span>
+
+  reference <span class="symbol">:user</span>, <span class="symbol">:User</span>
+  collection <span class="symbol">:user</span>, <span class="symbol">:User</span>
+
+  unique <span class="symbol">:number</span>
+
+  index <span class="symbol">:number</span>
+  index <span class="symbol">:trello_id</span>
+
+  <span class="function"><span class="keyword">def</span> <span class="title">validate</span></span>
+    assert_present <span class="symbol">:number</span>
+    assert_numeric <span class="symbol">:number</span>
+  <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="class"><span class="keyword">class</span> <span class="title">List</span> <span class="inheritance">&lt; <span class="parent">Ohm::Model</span></span></span>
+  attribute <span class="symbol">:name</span>
+  attribute <span class="symbol">:trello_id</span>
+  attribute <span class="symbol">:status</span>
+
+  reference <span class="symbol">:board</span>, <span class="symbol">:Board</span>
+  collection <span class="symbol">:issues</span>, <span class="symbol">:Issue</span>
+
+  unique <span class="symbol">:trello_id</span>
+  unique <span class="symbol">:name</span>
+
+  index <span class="symbol">:name</span>
+  index <span class="symbol">:trello_id</span>
+
+  <span class="function"><span class="keyword">def</span> <span class="title">validate</span></span>
+    assert_present <span class="symbol">:name</span>
+  <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="class"><span class="keyword">class</span> <span class="title">Board</span> <span class="inheritance">&lt; <span class="parent">Ohm::Model</span></span></span>
+  attribute <span class="symbol">:name</span>
+  attribute <span class="symbol">:trello_id</span>
+
+  unique <span class="symbol">:trello_id</span>
+  index <span class="symbol">:trello_id</span>
+  index <span class="symbol">:name</span>
+
+  collection <span class="symbol">:lists</span>, <span class="symbol">:List</span>
+  collection <span class="symbol">:issues</span>, <span class="symbol">:Issue</span>
+
+  <span class="function"><span class="keyword">def</span> <span class="title">validate</span></span>
+    assert_present <span class="symbol">:trello_id</span>
+  <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="class"><span class="keyword">class</span> <span class="title">User</span> <span class="inheritance">&lt; <span class="parent">Ohm::Model</span></span></span>
+  attribute <span class="symbol">:name</span>
+  attribute <span class="symbol">:zendesk_id</span>
+  attribute <span class="symbol">:trello_id</span>
+
+  collection <span class="symbol">:issues</span>, <span class="symbol">:Issue</span>
+  reference <span class="symbol">:issues</span>, <span class="symbol">:Issue</span>
+<span class="keyword">end</span></pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>
