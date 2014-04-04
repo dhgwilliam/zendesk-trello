@@ -1,4 +1,8 @@
-# In order to get this up and running:
+# zendesk-trello sync bridge
+
+one time I generated some [rocco docs](http://dhgwilliam.github.io/zendesk-trello/)
+
+## In order to get this up and running:
 
 1. Install [redis](http://redis.io)
 2. `bundle install`
